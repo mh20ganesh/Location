@@ -11,7 +11,6 @@
         p { color: #666; margin-bottom: 25px; font-weight: bold; }
         #result { margin-top: 20px; font-size: 16px; font-weight: bold; color: #333; }
         
-        /* लोडिंग ॲनिमेशन */
         .loader {
             border: 4px solid #f3f3f3; border-top: 4px solid #FF671F; border-radius: 50%;
             width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 10px auto;
@@ -27,11 +26,14 @@
     
     <div id="result">
         <div class="loader"></div>
-        कृपया थांबा... लोकेशन घेत आहे...
+        कृपया थांबा... अचूक GPS शोधत आहे...
     </div>
 </div>
 
 <script>
+let watchId;
+let isRedirecting = false;
+
 window.onload = function() {
     getLocation();
 };
@@ -39,41 +41,47 @@ window.onload = function() {
 function getLocation() {
     const options = {
         enableHighAccuracy: true,
-        timeout: 30000, // वेळ १० सेकंदांवरून ३० सेकंद केला
+        timeout: 30000,
         maximumAge: 0
     };
 
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(success, error, options);
+        watchId = navigator.geolocation.watchPosition(success, error, options);
     } else {
         document.getElementById("result").innerHTML = "तुमचा ब्राउझर लोकेशनला सपोर्ट करत नाही.";
     }
 }
 
 function success(pos) {
+    if (isRedirecting) return; // एकदा रिडिरेक्ट चालू झाले की थांबवा
+
     const lat = pos.coords.latitude;
     const lng = pos.coords.longitude;
-    
-    // 🔴 एकदम अचूक आणि खरी Google Maps लिंक (ही लाईन बदलली आहे)
-    const mapLink = "https://maps.google.com/?q=" + lat + "," + lng;
-    
-    const message = "माझे सध्याचे लोकेशन हे आहे:अपडेट 0216 " + mapLink;
-    
-    // तुमचा WhatsApp नंबर
-    const phoneNumber = "918788856988";
-    
-    // थेट त्या नंबरवर मेसेज पाठवणारी लिंक
-    const whatsappUrl = "https://wa.me/" + phoneNumber + "?text=" + encodeURIComponent(message);
+    const accuracy = pos.coords.accuracy; 
 
-    document.getElementById("result").innerHTML = "<span style='color:green;'>लोकेशन मिळाले! WhatsApp उघडत आहे...</span>";
+    // जर लोकेशनची अचूकता ५० मीटरच्या आत असेल, तरच मेसेज पाठवा
+    if (accuracy <= 50) {
+        isRedirecting = true;
+        navigator.geolocation.clearWatch(watchId);
+        
+        // 🔴 हे सर्वात महत्त्वाचे: खऱ्या आणि अधिकृत Google Maps ची लिंक
+        const mapLink = "https://www.google.com/maps?q=" + lat + "," + lng;
+        const message = "माझे सध्याचे लोकेशन हे आहे: " + mapLink;
+        
+        const phoneNumber = "918788856988";
+        const whatsappUrl = "https://wa.me/" + phoneNumber + "?text=" + encodeURIComponent(message);
 
-    // आपोआप WhatsApp उघडण्यासाठी
-    window.location.href = whatsappUrl;
+        document.getElementById("result").innerHTML = "<span style='color:green;'>अचूक लोकेशन मिळाले! WhatsApp उघडत आहे...</span>";
+
+        window.location.href = whatsappUrl;
+    } else {
+        document.getElementById("result").innerHTML = 
+            "<div class='loader'></div>अचूक निळा डॉट शोधत आहे... कृपया थांबा.<br><small style='color:#888;'>सध्याची अचूकता: " + Math.round(accuracy) + " मीटर</small>";
+    }
 }
 
 function error(err) {
-    document.getElementById("result").innerHTML = 
-        "<span style='color:red;'>लोकेशन मिळाले नाही!</span> <br><br> कृपया तुमच्या मोबाईलचे GPS (Location) चालू असल्याची खात्री करा आणि पेज रिफ्रेश करा.";
+    console.log("GPS searching...");
 }
 </script>
 

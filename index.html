@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>शिव गोरक्षक - लोकेशन</title>
+    <style>
+        body { margin: 0; padding: 0; font-family: sans-serif; background-color: #fcece3; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 90%; max-width: 350px; border-top: 10px solid #FF671F; }
+        h1 { color: #FF671F; font-size: 26px; margin-bottom: 5px; }
+        p { color: #666; margin-bottom: 25px; font-weight: bold; }
+        #result { margin-top: 20px; font-size: 16px; font-weight: bold; color: #333; }
+        
+        /* लोडिंग ॲनिमेशन */
+        .loader {
+            border: 4px solid #f3f3f3; border-top: 4px solid #FF671F; border-radius: 50%;
+            width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 10px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>शिव गोरक्षक<br>महाराष्ट्र राज्य</h1>
+    <p>जय गोमाता, जय शिवराय</p>
+    
+    <div id="result">
+        <div class="loader"></div>
+        कृपया थांबा... लोकेशन घेत आहे...
+    </div>
+</div>
+
+<script>
+window.onload = function() {
+    getLocation();
+};
+
+function getLocation() {
+    const options = {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+    };
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(success, error, options);
+    } else {
+        document.getElementById("result").innerHTML = "तुमचा ब्राउझर लोकेशनला सपोर्ट करत नाही.";
+    }
+}
+
+function success(pos) {
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
+    
+    // एकदम अचूक आणि अधिकृत Google Maps लिंक
+    const mapLink = "https://www.google.com/maps?q=" + lat + "," + lng;
+    const message = "माझे सध्याचे लोकेशन हे आहे: " + mapLink;
+    
+    // तुमचा WhatsApp नंबर
+    const phoneNumber = "918788856988";
+    
+    // थेट त्या नंबरवर मेसेज पाठवणारी लिंक
+    const whatsappUrl = "https://wa.me/" + phoneNumber + "?text=" + encodeURIComponent(message);
+
+    document.getElementById("result").innerHTML = "<span style='color:green;'>लोकेशन मिळाले! WhatsApp उघडत आहे...</span>";
+
+    // आपोआप WhatsApp उघडण्यासाठी
+    window.location.href = whatsappUrl;
+}
+
+function error(err) {
+    document.getElementById("result").innerHTML = 
+        "<span style='color:red;'>लोकेशन मिळाले नाही!</span> <br><br> कृपया तुमच्या ब्राउझरमध्ये लोकेशनची परवानगी (Allow) द्या.";
+}
+</script>
+
+</body>
+</html>

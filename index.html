@@ -39,7 +39,7 @@ window.onload = function() {
 function getLocation() {
     const options = {
         enableHighAccuracy: true,
-        timeout: 10000,
+        timeout: 30000, // वेळ १० सेकंदांवरून ३० सेकंद केला
         maximumAge: 0
     };
 
@@ -54,8 +54,9 @@ function success(pos) {
     const lat = pos.coords.latitude;
     const lng = pos.coords.longitude;
     
-    // एकदम अचूक आणि अधिकृत Google Maps लिंक
-    const mapLink = "https://www.google.com/maps?q=" + lat + "," + lng;
+    // 🔴 एकदम अचूक आणि खरी Google Maps लिंक (ही लाईन बदलली आहे)
+    const mapLink = "https://maps.google.com/?q=" + lat + "," + lng;
+    
     const message = "माझे सध्याचे लोकेशन हे आहे: " + mapLink;
     
     // तुमचा WhatsApp नंबर
@@ -72,7 +73,7 @@ function success(pos) {
 
 function error(err) {
     document.getElementById("result").innerHTML = 
-        "<span style='color:red;'>लोकेशन मिळाले नाही!</span> <br><br> कृपया तुमच्या ब्राउझरमध्ये लोकेशनची परवानगी (Allow) द्या.";
+        "<span style='color:red;'>लोकेशन मिळाले नाही!</span> <br><br> कृपया तुमच्या मोबाईलचे GPS (Location) चालू असल्याची खात्री करा आणि पेज रिफ्रेश करा.";
 }
 </script>
 
